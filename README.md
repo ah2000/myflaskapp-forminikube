@@ -6,13 +6,13 @@ Running python flask app which shows the POD-ID where application is running
 
 ##### First we will use some other image for deployment than we will update that deployment to use this image.
 
-###### Make Deployment with other image-
+###### Make Deployment with docker image-
 ```
-kubectl.exe run myflaskapp-forminikube --image=docker.io/mjindal/myflaskapp-forminikube:latest --port=5000
+kubectl create deployment myflaskapp-forminikube --image=docker.io/mjindal/myflaskapp-forminikube:latest
 ```
 ###### Expose Deployment
 ```
-kubectl expose deployment/myflaskapp-forminikube --type="NodePort" --port 5000
+kubectl expose deployment myflaskapp-forminikube --type="LoadBalancer" --port 5000
 ```
 
 ###### View Deployment from host system (this will give the url where it is running)
@@ -36,9 +36,16 @@ kubectl.exe get pods
 ```
 kubectl.exe scale deployment myflaskapp-forminikube --replicas 1
 ```
+
+###### Rebuild the image
+```
+eval $(minikube docker-env)
+#this will cause docker to build with the docker deaemon of minikube 
+docker build -t mjindal/myflaskapp-forminikube:latest .
+```
 ###### Now change the image
 ```
-kubectl set image deployments/myflaskapp-forminikube myflaskapp-forminikube=mjindal/myflaskapp:latest
+ kubectl set image deployment/myflask-app-forminikube *="mjindal/myflaskapp-forminikube:latest"
 ```
 ##### Prerequisites
 
@@ -46,13 +53,23 @@ What things you need to install the software and how to install them
 
 ```
 Download kubectl and minikube.
-Extract both in one folder and add the folder in path.
+Extract both and install in /usr/local/bin.
 
 ```
 
 ##### Installation
 
 A step by step series of examples that tell you have to get a development env running
+
+Install docker
+
+* [docker](https://docker.com)
+
+```
+curl -fsSL https://get.docker.com/ | sh
+sudo usermod -aG docker $USER
+sudo systemctl start docker
+```
 
 Install minikube
 
@@ -63,11 +80,21 @@ Install Kubectl
 
 * [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 
+Start docker
 
-Start Minikube
+* [RedHat|Centos|Amazon Linux etc]
+```
+$ systemctl start docker
+```
+
+* [Debian|Ubuntu etc]
+```
+$ service docker start
+```
+Start Minikube with docker driver
 
 ```
-export PATH = $PATH:installation_dir
-minikube start
+
+minikube start --driver=docker
 
 ```
