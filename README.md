@@ -17,24 +17,24 @@ kubectl expose deployment myflaskapp-forminikube --type="LoadBalancer" --port 50
 
 ###### View Deployment from host system (this will give the url where it is running)
 ```
-minikube.exe service myflaskapp-forminikube --url
+minikube service myflaskapp-forminikube --url
 ```
 you should see the container id where app is running .
 
 ###### Now scale application to use 5 containers
 ```
-kubectl.exe scale deployment myflaskapp-forminikube --replicas 5
+kubectl scale deployment myflaskapp-forminikube --replicas 5
 ```
 Refresh the browser you should see different-different container id.
 
 ###### There should be exactly 5 pods running -
 ```
-kubectl.exe get pods
+kubectl get pods
 ```
 
 ###### Scale down replica to 1 - 4 pods should die immediately !
 ```
-kubectl.exe scale deployment myflaskapp-forminikube --replicas 1
+kubectl scale deployment myflaskapp-forminikube --replicas 1
 ```
 
 ###### Rebuild the image
@@ -94,7 +94,6 @@ $ service docker start
 Start Minikube with docker driver
 
 ```
-
 minikube start --driver=docker
 
 ```
