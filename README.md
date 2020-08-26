@@ -2,13 +2,46 @@
 
 Running python flask app which shows the POD-ID where application is running
 
-#### Getting Started
+#### Getting Started - git Clone this project
 
-##### First we will use some other image for deployment than we will update that deployment to use this image.
-
-###### Make Deployment with docker image-
+###### Rebuild the image
 ```
-kubectl create deployment myflaskapp-forminikube --image=docker.io/mjindal/myflaskapp-forminikube:latest
+eval $(minikube docker-env)
+#this will cause docker to build with the docker deaemon of minikube 
+docker build -t myflaskapp-forminikube:latest myflaskapp-forminikube
+eval $(minikube docker-env -u)
+```
+##
+###### Make Deployment with local docker image on minikube daemon-
+```
+cat << YAMLEOF > myflaskapp-forminikube-deployment.yml 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: myflaskapp-forminikube
+  name: myflaskapp-forminikube
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myflaskapp-forminikube
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: myflaskapp-forminikube
+    spec:
+      containers:
+      - image: myflaskapp-forminikube:latest
+        name: myflaskapp-forminikube
+        resources: {}
+        imagePullPolicy: Never
+
+YAMLEOF
+kubectl apply -f myflaskapp-forminikube-deployment.yml
 ```
 ###### Expose Deployment
 ```
@@ -21,32 +54,6 @@ minikube service myflaskapp-forminikube --url
 ```
 you should see the container id where app is running .
 
-###### Now scale application to use 5 containers
-```
-kubectl scale deployment myflaskapp-forminikube --replicas 5
-```
-Refresh the browser you should see different-different container id.
-
-###### There should be exactly 5 pods running -
-```
-kubectl get pods
-```
-
-###### Scale down replica to 1 - 4 pods should die immediately !
-```
-kubectl scale deployment myflaskapp-forminikube --replicas 1
-```
-
-###### Rebuild the image
-```
-eval $(minikube docker-env)
-#this will cause docker to build with the docker deaemon of minikube 
-docker build -t mjindal/myflaskapp-forminikube:latest .
-```
-###### Now change the image
-```
- kubectl set image deployment/myflask-app-forminikube *="mjindal/myflaskapp-forminikube:latest"
-```
 ##### Prerequisites
 
 What things you need to install the software and how to install them
